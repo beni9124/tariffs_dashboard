@@ -218,11 +218,12 @@ const Dashboard = () => {
 
       {/* Main Dashboard Content */}
       <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="trends">Monthly Trends</TabsTrigger>
           <TabsTrigger value="comparison">Quarterly Analysis</TabsTrigger>
           <TabsTrigger value="breakdown">Country Breakdown</TabsTrigger>
+          <TabsTrigger value="yearcomparison">Year Comparison</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
@@ -234,7 +235,7 @@ const Dashboard = () => {
                   <PieChart className="h-5 w-5" />
                   Revenue Distribution by Country
                 </CardTitle>
-                <CardDescription>2024 total tariff income breakdown</CardDescription>
+                <CardDescription>{selectedYear} total tariff income breakdown</CardDescription>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={350}>
@@ -293,7 +294,7 @@ const Dashboard = () => {
           <Card>
             <CardHeader>
               <CardTitle>Country Performance Summary</CardTitle>
-              <CardDescription>Revenue amounts and growth rates for 2024</CardDescription>
+              <CardDescription>Revenue amounts and growth rates for {selectedYear}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="overflow-x-auto">
@@ -307,7 +308,7 @@ const Dashboard = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {tariffData.countryTotals2024.map((country, index) => (
+                    {(currentYearData.countryTotals || []).map((country, index) => (
                       <tr key={country.country} className="border-b hover:bg-gray-50">
                         <td className="p-3">
                           <div className="flex items-center gap-2">
@@ -322,6 +323,8 @@ const Dashboard = () => {
                         <td className="text-right p-3">{formatPercentage(country.percentage)}</td>
                         <td className="text-right p-3">
                           <span className={`px-2 py-1 rounded text-xs font-medium ${
+                            country.growth > 50 ? 'bg-red-100 text-red-800' :
+                            country.growth > 30 ? 'bg-orange-100 text-orange-800' :
                             country.growth > 10 ? 'bg-green-100 text-green-800' :
                             country.growth > 5 ? 'bg-yellow-100 text-yellow-800' :
                             'bg-gray-100 text-gray-800'
@@ -345,7 +348,7 @@ const Dashboard = () => {
                 <LineChart className="h-5 w-5" />
                 Monthly Tariff Revenue Trends
               </CardTitle>
-              <CardDescription>Revenue progression throughout 2024 (in billions USD)</CardDescription>
+              <CardDescription>Revenue progression throughout {selectedYear} (in billions USD)</CardDescription>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={400}>
@@ -381,7 +384,7 @@ const Dashboard = () => {
           <Card>
             <CardHeader>
               <CardTitle>Quarterly Comparison</CardTitle>
-              <CardDescription>Revenue comparison by quarters in 2024</CardDescription>
+              <CardDescription>Revenue comparison by quarters in {selectedYear}</CardDescription>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={400}>
@@ -404,7 +407,7 @@ const Dashboard = () => {
 
         <TabsContent value="breakdown" className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {tariffData.countryTotals2024.slice(0, 4).map((country) => (
+            {(currentYearData.countryTotals || []).slice(0, 4).map((country) => (
               <Card key={country.country}>
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
@@ -440,6 +443,8 @@ const Dashboard = () => {
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-gray-600">YoY Growth</span>
                       <span className={`px-2 py-1 rounded text-xs font-medium ${
+                        country.growth > 50 ? 'bg-red-100 text-red-800' :
+                        country.growth > 30 ? 'bg-orange-100 text-orange-800' :
                         country.growth > 10 ? 'bg-green-100 text-green-800' :
                         country.growth > 5 ? 'bg-yellow-100 text-yellow-800' :
                         'bg-gray-100 text-gray-800'
@@ -451,6 +456,98 @@ const Dashboard = () => {
                 </CardContent>
               </Card>
             ))}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="yearcomparison" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BarChart3 className="h-5 w-5" />
+                2024 vs 2025 Revenue Comparison
+              </CardTitle>
+              <CardDescription>Year-over-year comparison showing tariff policy impact</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={400}>
+                <BarChart data={yearComparisonData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="year" />
+                  <YAxis tickFormatter={(value) => `$${value}B`} />
+                  <Tooltip 
+                    formatter={(value, name) => [`$${value}B`, name]}
+                    labelFormatter={(label) => `Year: ${label}`}
+                  />
+                  <Legend />
+                  <Bar dataKey="China" fill="#dc2626" />
+                  <Bar dataKey="Mexico" fill="#16a34a" />
+                  <Bar dataKey="Canada" fill="#2563eb" />
+                  <Bar dataKey="Japan" fill="#ca8a04" />
+                  <Bar dataKey="Germany" fill="#7c3aed" />
+                </BarChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Policy Impact Analysis</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center p-3 bg-red-50 rounded">
+                    <span className="font-medium">Total Revenue Increase</span>
+                    <span className="text-red-600 font-bold">+50.2%</span>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-orange-50 rounded">
+                    <span className="font-medium">China Revenue Impact</span>
+                    <span className="text-orange-600 font-bold">+44.2%</span>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-green-50 rounded">
+                    <span className="font-medium">Mexico Revenue Growth</span>
+                    <span className="text-green-600 font-bold">+49.9%</span>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-blue-50 rounded">
+                    <span className="font-medium">Average Growth Rate</span>
+                    <span className="text-blue-600 font-bold">+53.1%</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Revenue Breakdown</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span>2024 Total</span>
+                      <span>$105.8B</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div className="bg-blue-500 h-2 rounded-full" style={{ width: '40%' }} />
+                    </div>
+                  </div>
+                  <div>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span>2025 Total</span>
+                      <span>$158.9B</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div className="bg-red-500 h-2 rounded-full" style={{ width: '100%' }} />
+                    </div>
+                  </div>
+                  <div className="mt-4 p-3 bg-gray-50 rounded">
+                    <p className="text-sm text-gray-600">
+                      The 2025 enhanced tariff policies resulted in a significant increase in revenue collection across all major trading partners, with Vietnam and India showing the highest growth rates.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </TabsContent>
       </Tabs>
