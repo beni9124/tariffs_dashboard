@@ -439,7 +439,47 @@ export const tariffData = {
     }
   ],
 
-  // Trade war impact data
+  // Quarterly comparison for 2025
+  quarterlyData2025: [
+    {
+      quarter: "Q1 2025",
+      china: 18360000000,
+      mexico: 3868000000,
+      canada: 2769000000,
+      japan: 1975000000,
+      germany: 1836000000,
+      total: 34171000000
+    },
+    {
+      quarter: "Q2 2025",
+      china: 20465000000,
+      mexico: 4269000000,
+      canada: 3054000000,
+      japan: 2195000000,
+      germany: 2058000000,
+      total: 38118000000
+    },
+    {
+      quarter: "Q3 2025",
+      china: 22715000000,
+      mexico: 4676000000,
+      canada: 3346000000,
+      japan: 2416000000,
+      germany: 2283000000,
+      total: 42229000000
+    },
+    {
+      quarter: "Q4 2025",
+      china: 25100000000,
+      mexico: 5088000000,
+      canada: 3638000000,
+      japan: 2636000000,
+      germany: 2509000000,
+      total: 46456000000
+    }
+  ],
+
+  // Trade war impact data (extended to 2025)
   tradeImpactData: [
     { year: "2019", tariffRevenue: 71000000000, tradeVolume: 2.31 },
     { year: "2020", tariffRevenue: 66000000000, tradeVolume: 2.05 },
