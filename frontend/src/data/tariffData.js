@@ -382,11 +382,25 @@ export const tariffData = {
     { country: "Thailand", amount: 2011000000, percentage: 1.9, growth: 8.9 }
   ],
 
+  // Country totals for 2025 (with increased tariff rates)
+  countryTotals2025: [
+    { country: "China", amount: 86640000000, percentage: 58.2, growth: 44.2 },
+    { country: "Mexico", amount: 18365000000, percentage: 12.3, growth: 49.9 },
+    { country: "Canada", amount: 12947000000, percentage: 8.7, growth: 48.2 },
+    { country: "Japan", amount: 9022000000, percentage: 6.1, growth: 49.1 },
+    { country: "Germany", amount: 8489000000, percentage: 5.7, growth: 54.1 },
+    { country: "South Korea", amount: 6998000000, percentage: 4.7, growth: 57.4 },
+    { country: "Vietnam", amount: 6313000000, percentage: 4.2, growth: 75.5 },
+    { country: "India", amount: 4958000000, percentage: 3.3, growth: 78.2 },
+    { country: "Taiwan", amount: 3906000000, percentage: 2.6, growth: 68.8 },
+    { country: "Thailand", amount: 3258000000, percentage: 2.2, growth: 62.0 }
+  ],
+
   // Top 5 countries monthly breakdown for detailed view
   top5Countries: ["China", "Mexico", "Canada", "Japan", "Germany"],
 
-  // Quarterly comparison
-  quarterlyData: [
+  // Quarterly comparison for both years
+  quarterlyData2024: [
     {
       quarter: "Q1 2024",
       china: 13130000000,
