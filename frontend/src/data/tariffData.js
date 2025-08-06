@@ -1,7 +1,7 @@
 // Mock tariff income data for US by country since 2024
 export const tariffData = {
-  // Monthly data for 2024-2025
-  monthlyData: [
+  // Monthly data for 2024
+  monthlyData2024: [
     {
       month: "Jan 2024",
       date: "2024-01",
