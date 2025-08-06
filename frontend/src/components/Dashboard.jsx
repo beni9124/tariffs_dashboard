@@ -1,8 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, TrendingUp, DollarSign, Globe, BarChart3, PieChart, LineChart } from 'lucide-react';
+import { Calendar, TrendingUp, DollarSign, Globe, BarChart3, PieChart, LineChart, ChevronDown } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Badge } from './ui/badge';
+import { Button } from './ui/button';
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuTrigger 
+} from './ui/dropdown-menu';
 import { tariffData, formatCurrency, formatPercentage, getCountryColor } from '../data/tariffData';
 import {
   AreaChart,
@@ -22,23 +29,35 @@ import {
 } from 'recharts';
 
 const Dashboard = () => {
-  const [selectedTimeframe, setSelectedTimeframe] = useState('2024');
+  const [selectedYear, setSelectedYear] = useState(2025);
   const [totalRevenue, setTotalRevenue] = useState(0);
+  const [currentYearData, setCurrentYearData] = useState({});
 
   useEffect(() => {
-    const total = tariffData.countryTotals2024.reduce((sum, country) => sum + country.amount, 0);
+    const yearData = selectedYear === 2024 ? {
+      monthlyData: tariffData.monthlyData2024,
+      countryTotals: tariffData.countryTotals2024,
+      quarterlyData: tariffData.quarterlyData2024
+    } : {
+      monthlyData: tariffData.monthlyData2025,
+      countryTotals: tariffData.countryTotals2025,
+      quarterlyData: tariffData.quarterlyData2025
+    };
+    
+    setCurrentYearData(yearData);
+    const total = yearData.countryTotals.reduce((sum, country) => sum + country.amount, 0);
     setTotalRevenue(total);
-  }, []);
+  }, [selectedYear]);
 
-  const topCountriesData = tariffData.countryTotals2024.map(country => ({
+  const topCountriesData = currentYearData.countryTotals?.map(country => ({
     name: country.country,
     value: country.amount,
     percentage: country.percentage,
     growth: country.growth,
     fill: getCountryColor(country.country)
-  }));
+  })) || [];
 
-  const monthlyTrendData = tariffData.monthlyData.map(month => ({
+  const monthlyTrendData = currentYearData.monthlyData?.map(month => ({
     month: month.month,
     China: month.china / 1000000000,
     Mexico: month.mexico / 1000000000,
@@ -46,9 +65,9 @@ const Dashboard = () => {
     Japan: month.japan / 1000000000,
     Germany: month.germany / 1000000000,
     Total: month.total / 1000000000
-  }));
+  })) || [];
 
-  const quarterlyComparisonData = tariffData.quarterlyData.map(quarter => ({
+  const quarterlyComparisonData = currentYearData.quarterlyData?.map(quarter => ({
     quarter: quarter.quarter,
     China: quarter.china / 1000000000,
     Mexico: quarter.mexico / 1000000000,
@@ -56,7 +75,33 @@ const Dashboard = () => {
     Japan: quarter.japan / 1000000000,
     Germany: quarter.germany / 1000000000,
     Total: quarter.total / 1000000000
-  }));
+  })) || [];
+
+  // Year-over-year comparison data
+  const yearComparisonData = [
+    {
+      year: "2024",
+      China: 60.1,
+      Mexico: 12.3,
+      Canada: 8.7,
+      Japan: 6.1,
+      Germany: 5.5,
+      Total: 105.8
+    },
+    {
+      year: "2025",
+      China: 86.6,
+      Mexico: 18.4,
+      Canada: 12.9,
+      Japan: 9.0,
+      Germany: 8.5,
+      Total: 158.9
+    }
+  ];
+
+  const topCountry = currentYearData.countryTotals?.[0];
+  const growthRate = selectedYear === 2025 ? 50.2 : 12.4;
+  const previousYear = selectedYear === 2025 ? 2024 : 2023;
 
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
@@ -86,11 +131,30 @@ const Dashboard = () => {
             </h1>
             <p className="text-gray-600 mt-1">Import tariff income by country since 2024</p>
           </div>
-          <div className="flex items-center gap-2">
-            <Badge variant="outline" className="px-3 py-1">
-              <Calendar className="h-4 w-4 mr-2" />
-              2024 Data
-            </Badge>
+          <div className="flex items-center gap-4">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4" />
+                  {selectedYear} Data
+                  <ChevronDown className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => setSelectedYear(2024)}>
+                  2024 Data
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSelectedYear(2025)}>
+                  2025 Data
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            {selectedYear === 2025 && (
+              <Badge variant="secondary" className="px-3 py-1">
+                <TrendingUp className="h-4 w-4 mr-2" />
+                New Policies
+              </Badge>
+            )}
           </div>
         </div>
       </div>
@@ -99,13 +163,13 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Revenue 2024</CardTitle>
+            <CardTitle className="text-sm font-medium">Total Revenue {selectedYear}</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">{formatCurrency(totalRevenue)}</div>
             <p className="text-xs text-muted-foreground">
-              +12.8% from 2023
+              +{growthRate}% from {previousYear}
             </p>
           </CardContent>
         </Card>
@@ -116,9 +180,9 @@ const Dashboard = () => {
             <Globe className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">China</div>
+            <div className="text-2xl font-bold">{topCountry?.country || 'China'}</div>
             <p className="text-xs text-muted-foreground">
-              56.8% of total revenue
+              {topCountry?.percentage?.toFixed(1) || '58.2'}% of total revenue
             </p>
           </CardContent>
         </Card>
@@ -138,13 +202,15 @@ const Dashboard = () => {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Growth Rate</CardTitle>
+            <CardTitle className="text-sm font-medium">Policy Impact</CardTitle>
             <LineChart className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600">+12.4%</div>
+            <div className="text-2xl font-bold text-blue-600">
+              {selectedYear === 2025 ? '+50.2%' : '+12.4%'}
+            </div>
             <p className="text-xs text-muted-foreground">
-              YoY average growth
+              {selectedYear === 2025 ? 'Enhanced tariffs' : 'Standard rates'}
             </p>
           </CardContent>
         </Card>
