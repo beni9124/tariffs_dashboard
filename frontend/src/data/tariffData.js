@@ -486,8 +486,19 @@ export const tariffData = {
     { year: "2021", tariffRevenue: 80000000000, tradeVolume: 2.67 },
     { year: "2022", tariffRevenue: 88000000000, tradeVolume: 2.94 },
     { year: "2023", tariffRevenue: 95000000000, tradeVolume: 3.15 },
-    { year: "2024", tariffRevenue: 105840000000, tradeVolume: 3.42 }
-  ]
+    { year: "2024", tariffRevenue: 105840000000, tradeVolume: 3.42 },
+    { year: "2025", tariffRevenue: 158900000000, tradeVolume: 3.89 }
+  ],
+
+  // Helper function to get data by year
+  getYearData: (year) => {
+    const yearStr = year.toString();
+    return {
+      monthlyData: tariffData[`monthlyData${yearStr}`] || [],
+      countryTotals: tariffData[`countryTotals${yearStr}`] || [],
+      quarterlyData: tariffData[`quarterlyData${yearStr}`] || []
+    };
+  }
 };
 
 // Helper functions to format data
